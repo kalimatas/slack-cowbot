@@ -31,9 +31,15 @@ func cowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	replacer := strings.NewReplacer("\r", "")
+	text := replacer.Replace(r.FormValue("text"))
+
+	balloonWithCow := slack_cowbot.BuildBalloonWithCow(strings.Split(text, "\n"))
+	fmt.Println(balloonWithCow)
+
 	resp := cowResponse{
 		Type: "in_channel",
-		Text: slack_cowbot.BuildBalloonWithCow(strings.Split(r.FormValue("text"), "\n")),
+		Text: fmt.Sprintf("```%s```", balloonWithCow),
 	}
 	jsonResp, _ := json.Marshal(resp)
 

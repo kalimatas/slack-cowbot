@@ -8,12 +8,11 @@ import (
 	"unicode/utf8"
 )
 
-const cow = `         \  ^__^
-          \ (oo)\_______
-	    (__)\       )\/\
-	        ||----w |
-	        ||     ||
-		`
+const cow = `        \  ^__^
+         \ (oo)\_______
+           (__)\       )\/\
+               ||----w |
+               ||     ||`
 
 // buildBalloon takes a slice of strings of max width maxwidth
 // prepends/appends margins on first and last line, and at start/end of each line
@@ -25,7 +24,7 @@ func buildBalloon(lines []string, maxwidth int) string {
 
 	borders = []string{"/", "\\", "\\", "/", "|", "<", ">"}
 
-	top := " " + strings.Repeat("_", maxwidth+2)
+	top := " " + strings.Repeat("-", maxwidth+2)
 	bottom := " " + strings.Repeat("-", maxwidth+2)
 
 	ret = append(ret, top)
