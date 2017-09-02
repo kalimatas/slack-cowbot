@@ -13,6 +13,7 @@ import (
 )
 
 var port string = "80"
+var token string
 
 type cowResponse struct {
 	Type string `json:"response_type"`
@@ -20,6 +21,11 @@ type cowResponse struct {
 }
 
 func init() {
+	token = os.Getenv("COWSAY_TOKEN")
+	if "" == token {
+		panic("COWSAY_TOKEN is not set!")
+	}
+
 	if "" != os.Getenv("COWSAY_PORT") {
 		port = os.Getenv("COWSAY_PORT")
 	}
@@ -31,12 +37,15 @@ func cowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if token != r.FormValue("token") {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	replacer := strings.NewReplacer("\r", "")
 	text := replacer.Replace(r.FormValue("text"))
 
 	balloonWithCow := slack_cowbot.BuildBalloonWithCow(strings.Split(text, "\n"))
-	fmt.Println(balloonWithCow)
-
 	resp := cowResponse{
 		Type: "in_channel",
 		Text: fmt.Sprintf("```%s```", balloonWithCow),
