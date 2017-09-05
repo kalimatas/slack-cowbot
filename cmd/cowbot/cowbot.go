@@ -26,8 +26,8 @@ func init() {
 		panic("COWSAY_TOKEN is not set!")
 	}
 
-	if "" != os.Getenv("COWSAY_PORT") {
-		port = os.Getenv("COWSAY_PORT")
+	if "" != os.Getenv("PORT") {
+		port = os.Getenv("PORT")
 	}
 }
 
