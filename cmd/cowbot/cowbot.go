@@ -9,7 +9,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/kalimatas/slack-cowbot"
+	sc "github.com/kalimatas/slack-cowbot"
 )
 
 var port string = "80"
@@ -33,19 +33,24 @@ func init() {
 
 func cowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	if token != r.FormValue("token") {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
 	replacer := strings.NewReplacer("\r", "")
 	text := replacer.Replace(r.FormValue("text"))
 
-	balloonWithCow := slack_cowbot.BuildBalloonWithCow(strings.Split(text, "\n"))
+	balloonWithCow, err := sc.Cowsay(text)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	resp := cowResponse{
 		Type: "in_channel",
 		Text: fmt.Sprintf("```%s```", balloonWithCow),
