@@ -17,7 +17,7 @@ func Cowsay(text string) (string, error) {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return string(out), nil

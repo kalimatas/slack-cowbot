@@ -12,13 +12,10 @@ import (
 	sc "github.com/kalimatas/slack-cowbot"
 )
 
-var port string = "80"
-var token string
-
-type cowResponse struct {
-	Type string `json:"response_type"`
-	Text string `json:"text"`
-}
+var (
+	port  string = "80"
+	token string
+)
 
 func init() {
 	token = os.Getenv("COWSAY_TOKEN")
@@ -42,20 +39,21 @@ func cowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	replacer := strings.NewReplacer("\r", "")
-	text := replacer.Replace(r.FormValue("text"))
-
+	text := strings.Replace(r.FormValue("text"), "\r", "", -1)
 	balloonWithCow, err := sc.Cowsay(text)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	resp := cowResponse{
+	jsonResp, _ := json.Marshal(struct {
+		Type string `json:"response_type"`
+		Text string `json:"text"`
+	}{
 		Type: "in_channel",
 		Text: fmt.Sprintf("```%s```", balloonWithCow),
-	}
-	jsonResp, _ := json.Marshal(resp)
+	})
 
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, string(jsonResp))
